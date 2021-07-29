@@ -1,0 +1,108 @@
+
+namespace FrameWorkDevelopment
+{
+
+  class Results 
+ {
+   public DocX ResultDocument{get;private set;}
+
+
+     public void InsertWordDocumnet(string WordFilePath ,string TestCaseName)
+      {
+
+      ResultDocument =DocX.Create(WordFilePath);
+      ResultDocument.AddHeaders();
+      Xceed.Document.NET.Header ResultHeader = ResultDocument.Headers.Odd;
+      Image HeaderImage = ResultDocument.AddImage("AddLogoPath");
+      Picture picture = HeaderImage.CreatePicture();
+      picture.Width=150;
+      picture.Height =28;
+      Paragraph Header = ResultHeader.InsertParagraph();
+      Header.Alignment = Alignment.right;
+      Header.AppendPicture(picture);
+
+      Paragraph Date = ResultDocument.InsertParagraph();
+      string strDate = System.DateTime.Today.ToString("dd-mm-yyyy");
+      Paragraph date = Date.Append("Execution Date:"+strDate).FontSize(8).Font("Calibri").Color(System.Drawing.Color.FromArgb(1,74,73,71));
+      date.Alignment =Alignment.left;
+
+      string Testname = NUnit.Framework.TestContext.CurrentContext.Test.Name;
+
+      Paragraph title = ResultDocument.InsertParagraph().FontSize(8).Font("Calibri").Color(System.Drawing.Color.FromArgb(1,74,73,71));
+      title.Alignment =Alignment.left;
+      title.AppendLine();
+
+      string Host = "EndPointHostName";
+
+      string[] tableHeading = {"projectName","HostName","ScenarioName","Browser"};
+      string[] Tabledata = {"ProjetName",Host,TestCaseName,"Browser"};
+
+      Table table = ResultDocument.AddTable(tableHeading.Length,2);
+      table.Alignment =Alignment.center;
+
+      table.Design = TableDesign.TableGrid;
+
+      for(int row =0;row<tableHeading.Length;row++)
+      {
+
+      table.Rows[row].Cells[0].Paragraphs[0].Append(tableHeading[row]).Bold();
+      table.Rows[row].Cells[1].Paragraphs[0].Append(Tabledata[row]);
+      }
+
+      ResultDocument.InsertTable(table);
+
+      Paragraph last = ResultDocument.InsertParagraph();
+
+      for(int newline=0;newline<=40;newline++)
+      {
+
+      last.AppendLine();
+
+      }
+
+      ResultDocument.Save();
+
+    }
+
+
+      public void InsertResults(string filename,string ScreenName,string screenshot_Path)
+      {
+
+        var ResultDocumentSummary = DocX.Load(filename);
+        Paragraph step = ResultDocumentSummary.InsertParagraph();
+        step.AppendLine();
+        Xceed.Document.NET.Image image = ResultDocumentSummary.AddImage(screenshot_Path);
+        Picture picture = image.CreatePicture();
+        picture.Width =450;
+        picture.Height =200;
+
+        Paragraph title = ResultDocumentSummary.InsertParagraph().Append("Screen Name: -" + ScreenName);
+        title.Alignment = Alignment.left;
+
+        step.AppendLine();
+        step.AppendPicture(picture);
+        step.AppendLine();
+        ResultDocumentSummary.Save();
+
+      }
+     
+      internal void CreateWordDocument(string WordFilePath,string ScenarioName)
+      {
+
+        InsertWordDocumnet(WordFilePath,ScenarioName);
+      }
+
+      
+
+  }
+    
+     
+
+
+ }
+ 
+
+
+
+
+
